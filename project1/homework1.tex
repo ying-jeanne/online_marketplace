@@ -1,0 +1,631 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\captionsetup{font=small}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{gray}\itshape,
+  stringstyle=\color{teal},
+  numberstyle=\tiny\color{gray},
+  numbers=left,
+  stepnumber=1,
+  numbersep=5pt,
+  backgroundcolor=\color{white},
+  frame=single,
+  breaklines=true,
+  showstringspaces=false,
+  tabsize=4,
+  emph={Model,quicksum,GRB,addVars,addConstr,optimize,RandomForestRegressor,minimize_scalar,train_test_split},
+  emphstyle=\color{violet}\bfseries,
+  morekeywords={as,from,import,def,return,if,else,try,except,for,in,range,print,max,min},
+}
+
+\geometry{margin=0.9in}
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\renewcommand{\footrulewidth}{0.4pt} % adds a line at the top of the footer
+\fancyfoot[R]{\thepage} % right-aligned page number
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.3em}
+
+% Reduce space before/after itemize/enumerate
+\usepackage{enumitem}
+\setlist{itemsep=0.1em, topsep=0.1em, leftmargin=2em}
+
+\title{DBA5113 Online Marketplace Assignment 1}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    {\Huge\bfseries DBA5113 Online Marketplace\\[0.5em]}
+    {\Huge Assignment 1 \par}
+    \vspace{1cm}
+    \includegraphics[width=0.30\textwidth]{nus_logo.png} \\[2em]
+    {\large Ying WANG\par}
+    {\large Tanya TOOLEY\par}
+    \vspace{0.5cm}
+    \vspace{1cm}
+    {\large
+    National University of Singapore \\
+    \vspace{0.5cm}
+    Submission Date: \today \\
+    \vspace{0.3cm}
+    \href{https://github.com/ying-jeanne/operation_research}{Link to code repository}
+    }
+    \vfill
+\end{titlepage}
+\thispagestyle{fancy}
+
+\section*{Exercise 1: Ride-Sharing Platform Simulation}
+
+\subsection*{1. Generate Data}
+
+\textit{Note: The complete Python implementation for Exercise 1 is available in Appendix~\ref{sec:ex1-code}.}
+
+We generate and simulate the positions of n riders and n drivers as random points with $n \in \{10, 30, 50\}$ respectively and the pairwise euclidean distances between all riders and drivers are calculated. The data generation is managed by function \textit{generate\_sample\_data(n, rng)}.
+
+\subsection*{2. Implement Matching Methods}
+We implement random matching, greedy matching and optimal matching methods (Hungarian algorithm) to match riders and drivers based on the generated distance data.
+
+The three matching methods are implemented in functions:
+\begin{itemize}
+    \item \textit{random\_matching(distance\_matrix)} 
+    \item \textit{greedy\_matching(distance\_matrix)}  
+    \item \textit{optimal\_matching(distance\_matrix)} 
+\end{itemize}
+
+\subsection*{3. Simulation}
+We run simulations for n = 10, 30, and 50 riders and drivers. For each n, we generate 1000 random instances of rider and driver locations, compute the total distance of each matching algorithm, and visualize the distribution of total distances.
+
+% Row 1: n=10 and n=30 graphs
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/total_distance_distribution_n_10.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/total_distance_distribution_n_30.png}
+    \end{minipage}
+    \caption{Total Distance Distribution for n=10 (left) and n=30 (right)}
+    \label{fig:total_distance_n10_n30}
+\end{figure}
+
+% Row 2: n=50 graph and table side by side
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/total_distance_distribution_n_50.png}
+        \captionof{figure}{Total Distance Distribution for n=50}
+        \label{fig:total_distance_n50}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \begin{tabular}{lccc}
+        \toprule
+        \textbf{Method} & \textbf{n=10} & \textbf{n=30} & \textbf{n=50} \\
+        \midrule
+        Random  & 5.23 & 15.65 & 26.08 \\
+        Greedy  & 2.86 & 5.86  & 8.11  \\
+        Optimal & 2.59 & 4.99  & 6.75  \\
+        \bottomrule
+        \end{tabular}
+        \captionof{table}{Average Total Distance}
+        \label{table:matching_distance}
+    \end{minipage}
+\end{figure}
+
+\subsection*{4. Network Effects}
+When n scales by a factor of 3 (from 10 to 30), the average total distance for random matching increases by approximately 3 times, while the average total distance for greedy and optimal matching increases by approximately $\sqrt{3} \approx 1.73$ times (here we see 1.9--2.0 times).
+
+This scaling behavior can be explained as follows: With n points uniformly distributed in a unit square, each point effectively ``owns'' an area of $1/n$. For optimized/heuristic matching algorithms (greedy and optimal), each rider is matched to a nearby driver within a region of side length $\sim 1/\sqrt{n}$. Thus, the expected distance per matched pair is proportional to $1/\sqrt{n}$, and the total distance across all n pairs is $n \times (1/\sqrt{n}) = \sqrt{n}$. When n increases by a factor of 3, the total distance increases by $\sqrt{3} \approx 1.73$, which aligns with the observed ratios of approximately 1.9--2.0 in our simulation results.
+
+For random matching, since pairs are assigned without optimization, the expected distance between any randomly matched rider-driver pair is constant (approximately 0.5 for a unit square). Therefore, the total distance scales linearly as $O(n)$, explaining why tripling n roughly triples the total distance.
+
+\subsection*{5. Endogeneity of n}
+
+The trade-off from increasing n is between \textbf{matching quality} and \textbf{waiting time}. As shown, when n is larger, the network effect is stronger, leading to shorter average pickup distances. However, increasing n also means customers must wait longer for n riders and n drivers to be batched together, especially during periods when demand or supply is sparse. This waiting time can lead to customer dissatisfaction and potential loss of business. Additionally, the optimal matching algorithm has $O(n^3)$ complexity, making computation more expensive as n grows.
+
+\vspace{0.3cm}
+\noindent\textbf{Modeling the Trade-off}
+
+Let $W(n)$ denote the expected waiting time to batch n riders and n drivers, and let $D(n)$ denote the expected average pickup distance. From our analysis:
+\begin{itemize}
+    \item $D(n) \propto \frac{1}{\sqrt{n}}$ (average distance per pair decreases with n)
+    \item $W(n) \propto n$ (waiting time increases linearly with batch size)
+\end{itemize}
+
+A platform objective that accounts for this trade-off could be:
+\[
+\min_{n} \quad \alpha \cdot D(n) + \beta \cdot W(n) = \alpha \cdot \frac{c_1}{\sqrt{n}} + \beta \cdot c_2 \cdot n
+\]
+
+where $\alpha$ represents the cost per unit distance (fuel, driver time) and $\beta$ represents the cost of customer waiting (dissatisfaction, churn risk). Taking the derivative and setting to zero:
+\[
+\frac{d}{dn}\left(\frac{\alpha c_1}{\sqrt{n}} + \beta c_2 n\right) = -\frac{\alpha c_1}{2n^{3/2}} + \beta c_2 = 0
+\]
+
+Solving for optimal $n^*$:
+\[
+n^* = \left(\frac{\alpha c_1}{2\beta c_2}\right)^{2/3}
+\]
+
+This shows that the optimal batch size depends on the relative importance of distance costs versus waiting costs. When distance costs dominate ($\alpha$ large), the platform should use larger batches. When waiting costs dominate ($\beta$ large), smaller batches are preferred.
+
+\textbf{Note}: Here waiting time is modeled as linear in n for tractability. In practice, it depends on demand/supply arrival rates and could be analyzed more precisely using queuing theory. But even with queuing theory, the waiting time is still proportional to n, so the equation should still be correct.
+
+\newpage
+\section*{Exercise 2: Quality Selection}
+
+\textit{Note: The complete Python implementation for Exercise 2 is available in Appendix~\ref{sec:ex2-code}.}
+
+\subsection*{1. Compute Demand}
+
+The plot for the two different density function is shown in Figure~\ref{fig:density_functions}. We can see the two density functions have quite different tail behavior. $f_1(v) = 0.5v^{-1.5}$ has a heavier tail (slower decay), meaning more buyers have high valuations ($v \geq 2$). In contrast, $f_2(v) = 3v^{-4}$ decays much faster, concentrating most buyer mass near $v = 1$ (low valuations).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/density_functions.png}
+    \caption{Density Functions $f_1(v)$ and $f_2(v)$}
+    \label{fig:density_functions}
+\end{figure}
+
+The demand for each menu and density function is computed using the provided code. The results are summarized below:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{llcc}
+\toprule
+\textbf{Density} & \textbf{Menu} & \textbf{$D_L$} & \textbf{$D_H$} \\
+\midrule
+\multirow{2}{*}{$f_1(v) = 0.5v^{-1.5}$} & Menu 1 (L+H) & 0.1840 & 0.6325 \\
+                                         & Menu 2 (H only) & --- & 0.7071 \\
+\midrule
+\multirow{2}{*}{$f_2(v) = 3v^{-4}$} & Menu 1 (L+H) & 0.2323 & 0.0640 \\
+                                     & Menu 2 (H only) & --- & 0.1250 \\
+\bottomrule
+\end{tabular}
+\caption{Demand Comparison for Different Density Functions and Menus}
+\label{table:demand_comparison}
+\end{table}
+
+We can see for both functions, when we apply only high quality menu, some low quality menu buyers moved towards high quality menu, leading to high quality menu demand increase. This aligns with class content.
+
+\subsection*{2. Revenue}
+The revenue for each menu and density function is computed using the provided code. The results are summarized below:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{llc}
+\toprule
+\textbf{Density} & \textbf{Menu} & \textbf{Revenue} \\
+\midrule
+\multirow{2}{*}{$f_1(v) = 0.5v^{-1.5}$} & Menu 1 (L+H) & \$2.81 \\
+                                         & Menu 2 (H only) & \$2.83 \\
+\midrule
+\multirow{2}{*}{$f_2(v) = 3v^{-4}$} & Menu 1 (L+H) & \$0.60 \\
+                                     & Menu 2 (H only) & \$0.50 \\
+\bottomrule
+\end{tabular}
+\caption{Revenue Comparison for Different Density Functions and Menus}
+\label{table:revenue_comparison}
+\end{table}
+
+We can see that for $f_1$, the revenue is slightly higher when only offering the high quality menu, while for $f_2$, the revenue is lower. This relates to \textbf{price elasticity}: in this model, a buyer's valuation parameter $v$ determines their willingness to pay for quality. High-$v$ buyers are less price sensitive (inelastic), while low-$v$ buyers are more price sensitive (elastic).
+
+For $f_1$ (heavy tail), 70.7\% of buyers have $v \geq 2.0$, meaning the population is predominantly \textbf{less price elastic}. When the L option is removed, buyers in $[2.0, 2.5)$ who previously bought L now upgrade to H at a higher price, and the platform doesn't lose much revenue.
+
+For $f_2$ (light tail), 87.5\% of buyers have $v < 2.0$, meaning the population is predominantly \textbf{more price elastic}. When the L option is removed, these low-$v$ buyers cannot afford H and exit the market entirely. The revenue lost from these departing customers exceeds the gain from upgrading buyers, resulting in lower total revenue.
+
+\subsection*{3. Different Demand Model}
+Our analysis uses a multiplicative utility model: $U(v, q, p) = v \cdot q - p$, where the quality benefit scales with the buyer's valuation parameter $v$. This model is well-suited for ridesharing platforms like Grab, but may be less appropriate for freelance marketplaces like Upwork.
+
+\vspace{5px}
+\textbf{Why the multiplicative model fits ridesharing:}
+\begin{itemize}
+    \item Standardized, easy-to-judge service
+    
+    Rideshare services are uniform and easily comparable: a ride from A to B is the same core service across all drivers. Quality dimensions (vehicle condition, cleanliness, driver courtesy) are straightforward to evaluate.
+    \item Wide quality range
+    
+    The quality difference between JustGrab and GrabCar Premium is substantial and experiential, while the vehicle comfort, driver professionalism, and overall ride experience vary significantly.
+    \item Heterogeneous valuations
+    
+    Riders have diverse willingness to pay for comfort. A business traveler values premium features much more than a budget-conscious student, making the $v \cdot q$ interaction meaningful.
+\end{itemize}
+
+\vspace{5px}
+\textbf{Why Upwork may require a different model:}
+\begin{itemize}
+    \item Diverse, non-standard services
+    
+    Unlike ridesharing, freelance work on Upwork spans vastly different domains (writing, coding, design, consulting) with no uniform quality metric. What constitutes ``quality'' varies entirely by project type, making it difficult for buyers to compare across sellers.
+    \item Pre-screening and verification
+    
+    As discussed in class, platforms like Upwork pre-screen and verify sellers to ensure a minimum quality level. This creates a \textbf{quality floor} that compresses the effective quality range.
+
+    \item Narrow quality range
+     
+    With pre-screening, the difference between ``Top Rated'' and ``Standard'' sellers is smaller than the difference between premium and basic rideshare services. Both tiers deliver professional-quality work.
+    \item Additive model may be more appropriate
+    
+    When quality differences are small, an additive utility model $U = v + q - p$ (where quality provides a fixed bonus rather than scaling with $v$) may better capture buyer behavior. In this model, the premium for higher quality is relatively constant across buyers, rather than scaling with their valuation.
+\end{itemize}
+
+In summary, the multiplicative model captures markets where quality differences are large and experiential, while additive models may better fit markets where quality is more standardized due to platform curation.
+
+\newpage
+\section*{Exercise 3: Surge Pricing Schemas}
+
+\subsection*{1. Trip Length Distribution}
+
+The Exponential Distribution Model assumes that trip lengths follow an exponential distribution $\lambda e^{-\lambda x}$, in the given example parameter $\lambda = 0.1$, meaning the mean trip length is $\mu = 1/\lambda = 10$ miles.
+
+\textit{Note: The complete Python implementation for Exercise 3 is available in Appendix~\ref{sec:ex3-code}.}
+
+\subsubsection*{1.1 Simulation Results}
+
+We generated 10,000 random trip lengths in order to have a significant representation from an exponential distribution with $\lambda = 0.1$. Figure~\ref{fig:trip_length} shows the histogram of simulated trip lengths overlaid with the theoretical probability density function (PDF): 
+\begin{align*}
+f(x) = \lambda e^{-\lambda x} = 0.1 e^{-0.1x}
+\end{align*}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/trip_length_distribution.png}
+    \caption{Distribution of Trip Lengths (Exponential, $\lambda=0.1$)}
+    \label{fig:trip_length}
+\end{figure}
+
+The simulation confirms that the data follows the expected exponential distribution with sample mean = 9.77 which is close to the theoretical mean of 10 miles, matching the theoretical mean.
+
+\subsubsection*{1.2 Results Analysis}
+\begin{enumerate}[label=\alph*.]
+\item Assumptions and Realism
+
+The exponential distribution implies that short trips are most common, and the probability of a trip length decreases exponentially as the length increases. In ride-sharing, this assumption aligns with real-world data where the vast majority of rides are short commutes or last-mile connections (e.g., 2-5 miles), while very long trips (e.g., 20+ miles) are rare events.
+
+\item Support from Literature
+
+While the exponential distribution is widely used in modeling and simulation, the choice of distribution depends on spatial scale. Barbosa et al. (2018) \cite{barbosa2018human} provide a comprehensive review showing that for short distances within a city, trip distributions can appear exponential (driven by cost and time constraints), but as the spatial scale increases to include suburbs or regional travel, Power Law or Log-Normal distributions provide superior fits.
+
+For ride-sharing applications focused on intra-city urban trips (typically under 10 miles), the exponential distribution remains a reasonable and practical simplification, capturing the essential characteristic that shorter trips dominate the distribution.
+
+\item  Memoryless Property
+
+While less physically intuitive for trips, the memoryless property simplifies the mathematics. It implies that the probability of a trip continuing for another mile doesn't depend on how far it has already gone (though in reality, trips do have destinations). Ideally, a Log-Normal distribution might fit better, but Exponential is a standard simplifying assumption for these problems.
+
+\end{enumerate}
+
+\subsection*{2. Pricing Schemes Comparison}
+
+We compare two surge pricing mechanisms:
+
+\textbf{Multiplicative Surge Pricing:}
+\begin{align*}
+\text{Payout} = \text{Base Fare} \times \text{Surge Multiplier}
+\end{align*}
+\textbf{Additive Surge Pricing:}
+\begin{align*}
+\text{Payout} = \text{Base Fare} + (\text{Surge Multiplier} - 1) \times \text{Surge Bonus}
+\end{align*}
+where Base Fare $= c + r \cdot x$, with $c$ is a fixed constant fee, $r$ is the per-mile rate, and $x$ is the trip length. The Surge Bonus is a fixed amount added during surge periods.
+
+\subsection*{2.1 Simulation Results}
+
+We generated 10,000 trips with:
+\begin{itemize}
+    \item Trip lengths: Exponential distribution ($\lambda = 0.1$)
+    \item Surge multipliers: $\{1.0, 1.5, 2.0, 2.5\}$ with probabilities $\{0.5, 0.3, 0.15, 0.05\}$
+    \item Parameters: $c = 2.50$, $r = 0.75$, Surge Bonus $= 5.00$
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Pricing Scheme} & \textbf{Mean Payout (\$)} & \textbf{Variance} \\
+\midrule
+Multiplicative Surge & 13.58 & 132.68 \\
+Additive Surge & 11.74 & 58.37 \\
+\bottomrule
+\end{tabular}
+\caption{Pricing Scheme Statistics}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/pricing_scheme_comparison.png}
+    \caption{Distribution of Payouts: Multiplicative vs Additive Surge}
+    \label{fig:pricing_comparison}
+\end{figure}
+
+\subsection*{2.2 Results Analysis}
+
+The results confirm that multiplicative surge pricing introduces significantly higher variability into the driver's earnings (or passenger's cost) compared to a flat bonus scheme.
+
+\textbf{Mathematical Reasoning:}
+\begin{itemize}
+    \item \textbf{Additive:} The payout is $\text{BaseFare} + (K-1) \times \$5$, where $K$ is the random surge multiplier. For independent variables, $\text{Var}(X + cY) = \text{Var}(X) + c^2\text{Var}(Y)$. Here, $\text{Var}(\text{Payout}) = \text{Var}(\text{BaseFare}) + 25 \cdot \text{Var}(K)$. Since the multiplier coefficient (\$5) is fixed and relatively small, the surge component adds limited variance.
+
+    \item \textbf{Multiplicative:} The payout is $K \times \text{BaseFare}$, the product of two random variables. For independent $X$ and $Y$: $\text{Var}(XY) = E[X]^2\text{Var}(Y) + E[Y]^2\text{Var}(X) + \text{Var}(X)\text{Var}(Y)$. This formula shows that the variability of both components combines multiplicatively, leading to much higher total variance than the additive case.
+\end{itemize}
+This higher variance means that under multiplicative pricing, drivers face a wider range of possible earnings for the same trip length, leading to uncertainty and potential dissatisfaction.
+
+\subsection*{3. Driver Strategic Behavior}
+
+\textbf{(a) Impact of Multiplicative Surge Pricing:}
+
+In multiplicative surge pricing, drivers are more likely to cherry-pick rides. Since the variance is much higher, the difference in payout between long trips and short trips is significant. Drivers will ignore short rides to wait for a long one, especially during surge periods when the multiplier amplifies the base fare difference.
+
+\textbf{(b) Uber's Transition to Additive Pricing:}
+
+Moving to additive (flat bonus) pricing fixes this issue. The difference between long and short trips becomes relatively smaller. A +\$5 bonus is proportionally huge for a short trip (making it worth taking) but just a nice extra for a long trip. This levels the playing field and ensures short trips don't get rejected during busy times.
+
+By reducing variability and making short trips more attractive relative to their effort, the additive scheme encourages drivers to accept all rides rather than waiting for high-value trips, improving overall platform efficiency and customer satisfaction.
+
+From a utility-maximization perspective, drivers accept trips when the utility (payout relative to effort) exceeds their reservation threshold. Under multiplicative pricing, the utility gap between short and long trips is substantial, making it rational for drivers to incur the opportunity cost of waiting for high-utility trips \cite{chen2016dynamic}. The additive scheme narrows this utility gap: a flat +\$5 bonus represents a larger proportional utility gain for short trips than for long trips. When utility differences become sufficiently small, the marginal benefit of cherry-picking no longer justifies the waiting cost \cite{mcfadden1974conditional}. This aligns with rational inattention principles \cite{sims2003rational}, where agents economize on cognitive effort when differences are small, leading drivers to accept whichever trip arrives first rather than strategically waiting.
+
+\newpage
+\section*{Exercise 4: Spatial Pricing Optimization}
+
+\textit{Note: The complete Python implementation for Exercise 4 is available in Appendix~\ref{sec:ex4-code}.}
+
+\subsection*{1. Optimize Prices: Spatial vs Uniform Pricing}
+We consider a simplified ride-sharing platform with two zones (Zone A and Zone B) with the following characteristics:
+
+\textbf{Demand Functions:}
+\begin{align*}
+D_A(p) &= \max(0, 100 - 10p) \\
+D_B(p) &= \max(0, 50 - 8p)
+\end{align*}
+
+\textbf{Supply Constraints:}
+\begin{align*}
+S_A &= 45 \text{ rides} \\
+S_B &= 35 \text{ rides}
+\end{align*}
+
+\textbf{Profit Function:}
+
+For each zone, the profit is:
+\begin{align*}
+\Pi_i(p_i) = p_i \cdot \min(D_i(p_i), S_i)
+\end{align*}
+
+\textbf{Results Comparison:}
+The price optimization results for both uniform and spatial pricing strategies are summarized in Table~\ref{table:pricing_comparison}.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Strategy} & \textbf{Zone} & \textbf{Optimal Price (\$)} & \textbf{Sales} & \textbf{Revenue (\$)} \\
+\midrule
+\multirow{3}{*}{Spatial Pricing} & A & 5.50 & 45 & 247.50 \\
+                                  & B & 3.12 & 25 & 78.12 \\
+                                  & \textbf{Total} & --- & \textbf{70} & \textbf{325.62} \\
+\midrule
+Uniform Pricing & Both & 5.50 & 51 & 280.50 \\
+\midrule
+\multicolumn{5}{l}{\textbf{Profit Increase:} Spatial pricing yields \$45.12 (16\% increase)} \\
+\bottomrule
+\end{tabular}
+\caption{Pricing Strategy Comparison}
+\label{table:pricing_comparison}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/uniform_pricing_profit.png}
+    \caption{Profit vs Price (Uniform Pricing Strategy)}
+    \label{fig:uniform_pricing}
+\end{figure}
+
+The analysis shows that spatial pricing can be beneficial when different zones have different demand elasticities. Zone A has higher demand and lower price sensitivity, while Zone B has lower demand but requires a lower price to maximize profit.
+
+\subsection*{2. Estimate Demand and Optimize Prices}
+
+So instead of using known demand functions, we estimate demand using historical data and Random Forest regression. Since this is a non-linear method, we cannot use calculus to find optimal prices. Instead, we perform a grid search over possible prices to find the one that maximizes profit.
+
+\subsubsection*{2.1 Explanation of the Estimation Step}
+
+This step uses Random Forest to \textbf{estimate the demand function} from historical data, rather than assuming a known mathematical formula or a linear model. Random Forest can capture non-linearities (e.g., demand dropping to zero sharply) and interactions (e.g., price sensitivity increasing during bad sentiment) automatically without manually specifying interaction terms like \texttt{price $\times$ sentiment}.
+
+\vspace{0.3cm}
+\noindent\textbf{The Goal}
+
+We aim to understand how demand ($D$) responds to price ($p$) and other market factors. Since the true functional form is unknown (unlike the analytical case where $D = 100 - 10p$), we train a model to learn this relationship from data. While linear regression is an alternative approach, it assumes a linear relationship between features and demand, which may be too simplified to capture threshold effects, interaction terms, and other non-linear patterns commonly observed in real-world demand behavior.
+
+\vspace{0.3cm}
+\noindent\textbf{The Method}
+
+The code uses a \textbf{Random Forest Regressor}, which is a non-linear supervised learning algorithm.
+\begin{itemize}
+    \item Input ($X$): Price, Market Sentiment, Zone-Specific Features, Competitor Prices
+    \item Output ($y$): Observed Demand
+\end{itemize}
+
+By running \texttt{.fit(X\_train, y\_train)}, the model analyzes past transactions to find patterns. It effectively creates a mathematical function $f(X)$ that can predict demand for any given price.
+
+\vspace{0.3cm}
+\noindent\textbf{Validation}
+
+The code splits the data into a Training Set (80\%) and a Test Set (20\%).
+\begin{itemize}
+    \item The model learns from the Training Set
+    \item We test it on the Test Set to ensure it actually understands the general rule and didn't just memorize specific examples (overfitting)
+\end{itemize}
+
+\vspace{0.3cm}
+\noindent\textbf{Summary} 
+
+``Estimation'' here means using an algorithm to approximate the unknown relationship between price and demand so that we can use it for optimization later.
+
+\subsubsection*{2.2 Price Optimization Using Estimated Demand}
+
+Using the trained Random Forest models, we optimize prices for both spatial and uniform pricing strategies.
+
+\textbf{Current Market Context:}
+\begin{itemize}[nosep]
+    \item Market Sentiment: 1.0
+    \item Zone A Specific: 2.1, Zone B Specific: 1.0
+    \item Competitor Prices: Zone A = \$4.00, Zone B = \$6.00
+    \item Supply: $S_A = 45$, $S_B = 45$
+\end{itemize}
+
+\textbf{Optimization Results:}
+
+The Random Forest-based optimization results are summarized in Table~\ref{table:rf_pricing_comparison}.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Strategy} & \textbf{Zone} & \textbf{Optimal Price (\$)} & \textbf{Demand} & \textbf{Revenue (\$)} \\
+\midrule
+\multirow{3}{*}{Spatial Pricing} & A & 5.30 & 40.26 & 213.37 \\
+                                  & B & 3.40 & 13.47 & 45.80 \\
+                                  & \textbf{Total} & --- & \textbf{53.73} & \textbf{259.17} \\
+\midrule
+{Uniform Pricing} & Both & 5.30 & 41.92 & {\textbf{222.19}} \\
+\midrule
+\multicolumn{5}{l}{\textbf{Profit Increase:} Spatial pricing yields \$36.98 (17\% increase)} \\
+\bottomrule
+\end{tabular}
+\caption{Random Forest-Based Pricing Strategy Comparison}
+\label{table:rf_pricing_comparison}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/uniform_pricing_rf_profit.png}
+    \caption{Profit vs Price (Uniform Pricing) - Random Forest Estimation}
+    \label{fig:uniform_rf}
+\end{figure}
+
+The Random Forest approach accounts for market conditions and competitor pricing, providing more realistic demand estimates than simple linear models.
+
+\subsection*{3. Challenges in Scaling to Multiple Zones}
+
+When scaling this independent estimation + optimization approach to many zones, three main challenges arise:
+\begin{enumerate}[label=\alph*.]
+
+\item{\textbf{Optimization Computation Complexity (The ``Curse of Dimensionality'')}}
+
+In the current approach, we used grid search to check prices. This works fine for 1 or 2 zones. However, if you have $N$ zones, the search space grows exponentially ($\text{PriceGridSize}^N$). This becomes computationally intractable for large-scale systems.
+
+For example, with 100 zones and 151 price points each, we would need to evaluate $151^{100}$ combinations, which is impossible with brute force or simple grid search. We would need sophisticated optimization solvers (e.g., gradient-based methods, evolutionary algorithms) that can handle high-dimensional search spaces efficiently.
+
+\item{\textbf{Modeling Cross-Zone Spillover Effects}}
+
+The current code trains \texttt{rf\_A} and \texttt{rf\_B} independently, assuming Zone A's price doesn't affect Zone B. In a dense city with many zones, if Zone A is expensive, users might walk to Zone B or choose an alternative.
+
+Demand in Zone $i$ depends on prices in neighboring zones $j, k, l, \ldots$. Modeling these interactions rigorously requires estimating $N \times N$ cross-elasticities, which is:
+\begin{itemize}
+    \item Data-intensive: Requires sufficient observations of all price combinations
+    \item Computationally expensive: Training complex models with interaction terms
+    \item Model complexity: A simple ``one model per zone'' approach fails to capture these substitution patterns
+\end{itemize}
+
+\item{\textbf{Model Overfitting}}
+
+The rule of thumb says to train a Random Forest for every single zone, we need sufficient historical data (often exponential in size compare to feature numbers) for \textbf{each} zone covering various price points. In a system with thousands of zones:
+\begin{itemize}
+    \item Many zones (e.g., quiet suburbs) will have very few data (few rides)
+    \item Machine learning models like Random Forest perform poorly on little data
+    \item We might end up with unreliable demand curves for low-traffic zones
+    \item This leads to overfitting incorrect pricing decisions
+\end{itemize}
+
+\end{enumerate}
+
+Potential solutions include:
+\begin{itemize}
+    \item \textbf{Zone-Specific Clustering:} Share information across similar zones, borrowing the clustering idea we used in class for A/B testing, before running demand estimation, we merge zones with similar characteristics to increase data size per model, and introduce more generalization ability. This also bring an extra advantages of reducing the number of models to train, alleviating the computational burden.
+    \item \textbf{Transfer learning:} Use data from high-traffic zones to inform low-traffic zones. So that we "increase" the data size for zones with little data.
+    \item \textbf{Bayesian approaches:} For low data zone, incorporate prior knowledge and uncertainty quantification, instead of training from scratch.
+\end{itemize}
+
+\newpage
+\begin{thebibliography}{99}
+
+\bibitem{barbosa2018human}
+Barbosa, H., Barthelemy, M., Ghoshal, G., James, C. R., Lenormand, M., Louail, T., Menezes, R., Ramasco, J. J., Simini, F., and Tomasini, M. (2018).
+\textit{Human Mobility: Models and Applications}.
+Physics Reports, 734, 1-74.
+
+\bibitem{chen2016dynamic}
+Chen, M. K., and Sheldon, M. (2016).
+\textit{Dynamic Pricing in a Labor Market: Surge Pricing and Flexible Work on the Uber Platform}.
+EC '16: Proceedings of the 2016 ACM Conference on Economics and Computation, 455-455.
+
+\bibitem{mcfadden1974conditional}
+McFadden, D. (1974).
+\textit{Conditional Logit Analysis of Qualitative Choice Behavior}.
+In P. Zarembka (Ed.), Frontiers in Econometrics (pp. 105-142). Academic Press.
+
+\bibitem{sims2003rational}
+Sims, C. A. (2003).
+\textit{Implications of Rational Inattention}.
+Journal of Monetary Economics, 50(3), 665-690.
+
+\end{thebibliography}
+
+\newpage
+\appendix
+\section{Exercise 1 Complete Code}
+\label{sec:ex1-code}
+
+Below is the complete Python code for Exercise 1, which simulates a ride-sharing platform with varying numbers of drivers and customers.
+
+\lstinputlisting[caption={exercise1.py - Complete Implementation}, language=Python]{exercise1.py}
+
+\section{Exercise 2 Complete Code}
+\label{sec:ex2-code}
+Below is the complete Python code for Exercise 2, which computes demand based on different density functions.
+
+\lstinputlisting[caption={exercise2.py - Complete Implementation}, language=Python]{exercise2.py}
+
+\section{Exercise 3 Complete Code}
+\label{sec:ex3-code}
+
+Below is the complete Python code for Exercise 3, which generates the trip length distribution and pricing scheme comparison visualizations:
+
+\lstinputlisting[caption={exercise3.py - Complete Implementation}, language=Python]{exercise3.py}
+
+\newpage
+\section{Exercise 4 Complete Code}
+\label{sec:ex4-code}
+
+Below is the complete Python code for Exercise 4, which implements spatial vs uniform pricing optimization using both analytical demand functions and Random Forest demand estimation:
+
+\lstinputlisting[caption={exercise4.py - Complete Implementation}, language=Python]{exercise4.py}
+
+\end{document}

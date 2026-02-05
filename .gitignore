@@ -1,0 +1,12 @@
+venv/
+__pycache__
+code/
+**/*.docx
+**/*.out
+**/*.log
+**/*.fls
+**/*.fdb_latexmk
+**/*.aux
+**/*.synctex.gz
+.DS_Store
+project1/online_marketplace_A1.pdf
