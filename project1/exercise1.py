@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import cdist
 from scipy.optimize import linear_sum_assignment
+import os
 
 def generate_positions(n, rng):
     return rng.random((n, 2))
@@ -57,6 +58,9 @@ def run_simulations(n, sims=1000, seed=1):
     return {k: np.array(v) for k, v in out.items()}
 
 def plot_distributions(results_by_n, display=False):
+    # Create figures directory if it doesn't exist
+    os.makedirs("figures", exist_ok=True)
+    
     for n, res in results_by_n.items():
         plt.figure()
         for method in ["random", "greedy", "optimal"]:
@@ -68,7 +72,7 @@ def plot_distributions(results_by_n, display=False):
         if display:
             plt.show()
         else:
-            plt.savefig(f"figures/total_distance_distribution_n_{n}.png", dpi=300, bbox_inches='tight')
+            plt.savefig(os.path.join("figures", f"total_distance_distribution_n_{n}.png"), dpi=300, bbox_inches='tight')
             plt.close()
 
 def main():

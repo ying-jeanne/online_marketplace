@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
+import os
 
 def demand_A(p):
     return max(0, 100 - 10 * p)
@@ -44,6 +45,8 @@ def optimize_spatial(supply_A=45, supply_B=35):
     print(f"Total Profit: ${total_profit:.2f}")
 
 def optimize_uniform(display=False):
+    # Create figures directory if it doesn't exist
+    os.makedirs("figures", exist_ok=True)
     res = minimize_scalar(neg_total_profit_uniform, bounds=(0, 10), method='bounded')
     opt_p = res.x
     opt_rev = -res.fun
@@ -68,7 +71,7 @@ def optimize_uniform(display=False):
     if display:
         plt.show()
     else:
-        plt.savefig('figures/uniform_pricing_profit.png', dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join('figures', 'uniform_pricing_profit.png'), dpi=300, bbox_inches='tight')
         plt.close()
 
 def train_demand_models_with_rf():
@@ -181,7 +184,7 @@ def optimize_uniform_rf(rf_A, rf_B, price_grid, market_context, S_A=45, S_B=45, 
     if display:
         plt.show()
     else:
-        plt.savefig('figures/uniform_pricing_rf_profit.png', dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join('figures', 'uniform_pricing_rf_profit.png'), dpi=300, bbox_inches='tight')
         plt.close()
 
 def main():

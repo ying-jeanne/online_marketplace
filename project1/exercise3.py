@@ -27,7 +27,7 @@ def get_trip_length(lambd=0.1, n_samples=10000, display_plot=False):
     if display_plot:
         plt.show()
     else:
-        plt.savefig('figures/trip_length_distribution.png', dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join('figures', 'trip_length_distribution.png'), dpi=300, bbox_inches='tight')
         plt.close()
 
     return trip_lengths
@@ -77,7 +77,7 @@ def compare_pricing_schemes(n_trips=10000, lambd=0.1, c=2.50, r=0.75, surge_bonu
     if display_plot:
         plt.show()
     else:
-        plt.savefig('figures/pricing_scheme_comparison.png', dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join('figures', 'pricing_scheme_comparison.png'), dpi=300, bbox_inches='tight')
         plt.close()
     return payouts_mult, payouts_add
 

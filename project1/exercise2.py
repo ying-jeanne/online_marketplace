@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
+import os
 
 def demand_menu1(f, v_L, v_H, v_LH):
     # Demand for L: buyers in [v_L, v_LH) who prefer L
@@ -32,6 +33,8 @@ def f2(v):
     return 3.0 * v ** (-4.0)
 
 def plot_density_functions(display=False):
+    # Create figures directory if it doesn't exist
+    os.makedirs("figures", exist_ok=True)
     # Compute Demand, and plotting the density functions on [1,3]
     vs = np.linspace(1.0, 3.0, 400)
     plt.figure()
@@ -45,7 +48,7 @@ def plot_density_functions(display=False):
     if display:
         plt.show()
     else: 
-        plt.savefig("figures/density_functions.png")
+        plt.savefig(os.path.join("figures", "density_functions.png"))
         plt.close()
 
 def find_thresholds(pL, qL, pH, qH):
