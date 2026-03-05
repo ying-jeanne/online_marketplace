@@ -251,7 +251,9 @@ To choose the two fees to test, we should select $b=0.00$ and $b=0.10$ which ens
 
 \subsection*{(i) DoorDash's Choice of Thompson Sampling}
 
-DoorDash chose MAB with TS over other bandit algorithms because it naturally handles the exploration-exploitation trade-off through posterior sampling, which is computationally efficient for their large-scale system, and performs well empirically with binary outcomes (accept/reject). They preferred it over offline ML methods because TS can \textbf{learn and adapt in real-time} without a separate training phase, handles the cold-start problem for new Dashers through informative priors, and avoids the feedback loop issues of offline models that are trained on non-representative historical data. 
+DoorDash chose MAB with TS over other bandit algorithms because it naturally handles the exploration-exploitation trade-off through posterior sampling, which is computationally efficient for large-scale systems, and it performs well empirically with binary outcomes (accept/reject). 
+
+They preferred it over offline ML methods because TS can \textbf{learn and adapt in real-time} without a separate training phase, handles the cold-start problem for new Dashers through informative priors, and avoids the feedback loop issues of offline models that are trained on non-representative historical data. 
 
 They tested the algorithm using \textbf{switchback experiments} (alternating between TS and random/baseline messaging in different time periods) to measure the causal impact on Dasher conversion rates and supply availability.
 
